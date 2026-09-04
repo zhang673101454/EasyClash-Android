@@ -120,13 +120,11 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
     }
 
     override fun onProfileUpdateCompleted(uuid: UUID?) {
-        if(uuid == null)
-            return;
+        if (uuid == null) return
         launch {
-            var name: String? = null;
-            withProfile {
-                name = queryByUUID(uuid)?.name
-            }
+            design?.fetch()
+            var name: String? = null
+            withProfile { name = queryByUUID(uuid)?.name }
             design?.showToast(
                 getString(R.string.toast_profile_updated_complete, name),
                 ToastDuration.Long
@@ -134,17 +132,16 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
         }
     }
     override fun onProfileUpdateFailed(uuid: UUID?, reason: String?) {
-        if(uuid == null)
-            return;
+        if (uuid == null) return
         launch {
-            var name: String? = null;
-            withProfile {
-                name = queryByUUID(uuid)?.name
+            val tip = if (!clashRunning) {
+                getString(R.string.subscription_refresh_need_proxy)
+            } else {
+                var name: String? = null
+                withProfile { name = queryByUUID(uuid)?.name }
+                getString(R.string.toast_profile_updated_failed, name, reason)
             }
-            design?.showToast(
-                getString(R.string.toast_profile_updated_failed, name, reason),
-                ToastDuration.Long
-            ){
+            design?.showToast(tip, ToastDuration.Long) {
                 setAction(R.string.edit) {
                     startActivity(PropertiesActivity::class.intent.setUUID(uuid))
                 }

@@ -106,6 +106,15 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
         requests.trySend(request)
     }
 
+    /** 布局点击：避免 DataBinding 直接引用 sealed object（需 .INSTANCE，kapt 易挂）。 */
+    fun requestShowHome() {
+        requests.trySend(Request.ShowHome)
+    }
+
+    fun requestOpenProxy() {
+        requests.trySend(Request.OpenProxy)
+    }
+
     fun requestCreate() {
         requests.trySend(Request.Create)
     }

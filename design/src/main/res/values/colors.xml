@@ -2,6 +2,7 @@
 <resources>
     <color name="color_clash_light">#0891b2</color>
     <color name="color_clash_dark">#22d3ee</color>
+    <color name="color_text_secondary">#64748b</color>
     <color name="color_system_ui_overlay">#50000000</color>
     <color name="color_light_background">#f4f6f8</color>
     <color name="color_dark_background">#020617</color>

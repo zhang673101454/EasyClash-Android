@@ -36,7 +36,6 @@
             type="String" />
 
         <import type="android.view.View" />
-        <import type="com.github.kr328.clash.design.MainDesign.Request" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -129,9 +128,9 @@
                     android:layout_weight="1"
                     android:background="@{homeTab ? @drawable/bg_ec_picker_active : null}"
                     android:gravity="center"
-                    android:onClick="@{() -> self.request(Request.ShowHome)}"
+                    android:onClick="@{() -> self.requestShowHome()}"
                     android:text="@string/tab_connect"
-                    android:textColor="@{homeTab ? @color/color_clash_light : ?android:attr/textColorSecondary}"
+                    android:textColor="@{homeTab ? @color/color_clash_light : @color/color_text_secondary}"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
@@ -141,9 +140,9 @@
                     android:layout_weight="1"
                     android:background="@{homeTab ? null : @drawable/bg_ec_picker_active}"
                     android:gravity="center"
-                    android:onClick="@{() -> self.request(Request.OpenProxy)}"
+                    android:onClick="@{() -> self.requestOpenProxy()}"
                     android:text="@string/tab_nodes"
-                    android:textColor="@{homeTab ? ?android:attr/textColorSecondary : @color/color_clash_light}"
+                    android:textColor="@{homeTab ? @color/color_text_secondary : @color/color_clash_light}"
                     android:textSize="13sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -168,20 +167,20 @@
             android:paddingStart="12dp"
             android:paddingTop="12dp"
             android:paddingEnd="12dp"
-            android:paddingBottom="@{self.surface.insets.bottom + 12}">
+            android:paddingBottom="@{(float) self.surface.insets.bottom + 12f}">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{@string/app_meta_author(appAuthor)}"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/color_text_secondary"
                 android:textSize="9sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{@string/app_meta_version(appVersion)}"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="@color/color_text_secondary"
                 android:textSize="9sp" />
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
