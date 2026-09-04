@@ -9,8 +9,12 @@ import androidx.core.content.ContextCompat
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.common.util.setUUID
 import com.github.kr328.clash.common.util.ticker
+import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.model.ProxySort
 import com.github.kr328.clash.design.MainDesign
+import com.github.kr328.clash.design.ProxyDesign
 import com.github.kr328.clash.design.R as DesignR
+import com.github.kr328.clash.design.model.ProxyState
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.util.startClashService
@@ -20,15 +24,26 @@ import com.github.kr328.clash.util.withProfile
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
- * EasyClash 主界面：订阅列表 + 点卡开关代理 + 节点入口。
- * 多订阅互刷：先开能用的订阅，再对其它订阅点「更新」（经当前 VPN 隧道拉取）。
+ * EasyClash 主界面：连接 / 节点同页 Tab；点订阅开关代理；节点单列按延迟自动选最低。
  */
 class MainActivity : BaseActivity<MainDesign>() {
+    private var proxyDesign: ProxyDesign? = null
+    private var proxyNames: List<String> = emptyList()
+    private var proxyStates: List<ProxyState> = emptyList()
+    private val reloadLock = Semaphore(10)
+
     override suspend fun main() {
+        // 精简节点偏好（覆盖旧安装残留）
+        uiStore.proxyLine = 1
+        uiStore.proxySort = ProxySort.Delay
+        uiStore.proxyExcludeNotSelectable = true
+
         val design = MainDesign(this)
         setContentDesign(design)
         design.fetchStatus()
@@ -38,18 +53,23 @@ class MainActivity : BaseActivity<MainDesign>() {
         val elapsedTicker = ticker(TimeUnit.MINUTES.toMillis(1))
 
         while (isActive) {
+            val embeddedProxy = proxyDesign
             select<Unit> {
                 events.onReceive {
                     when (it) {
                         Event.ActivityStart -> {
-                            design.setHomeTab(true)
                             design.fetchStatus()
                             design.fetchProfiles()
                         }
                         Event.ServiceRecreated,
                         Event.ClashStop,
-                        Event.ClashStart,
-                        Event.ProfileLoaded -> design.fetchStatus()
+                        Event.ClashStart -> design.fetchStatus()
+                        Event.ProfileLoaded -> {
+                            design.fetchStatus()
+                            if (proxyDesign != null) {
+                                launch { recreateProxyPanel(design) }
+                            }
+                        }
                         Event.ProfileChanged -> {
                             design.fetchStatus()
                             design.fetchProfiles()
@@ -62,17 +82,21 @@ class MainActivity : BaseActivity<MainDesign>() {
                         MainDesign.Request.ShowHome -> design.setHomeTab(true)
                         MainDesign.Request.OpenProxy -> {
                             design.setHomeTab(false)
-                            startActivity(ProxyActivity::class.intent)
+                            ensureProxyPanel(design)
                         }
-                        MainDesign.Request.Create ->
-                            startActivity(NewProfileActivity::class.intent)
-                        MainDesign.Request.UpdateAll -> Unit
+                        MainDesign.Request.UrlTest -> proxyDesign?.requestUrlTesting()
+                        MainDesign.Request.Create -> createSubscription()
                         is MainDesign.Request.Active -> design.toggleSubscription(req.profile)
                         is MainDesign.Request.Update -> design.updateSubscription(req.profile)
                         is MainDesign.Request.Edit ->
                             startActivity(PropertiesActivity::class.intent.setUUID(req.profile.uuid))
                         is MainDesign.Request.Delete ->
                             withProfile { delete(req.profile.uuid) }
+                    }
+                }
+                if (embeddedProxy != null) {
+                    embeddedProxy.requests.onReceive { req ->
+                        handleProxyRequest(design, req)
                     }
                 }
                 if (clashRunning) {
@@ -86,6 +110,101 @@ class MainActivity : BaseActivity<MainDesign>() {
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun createSubscription() {
+        withProfile {
+            val uuid = create(Profile.Type.Url, getString(DesignR.string.new_profile))
+            startActivity(PropertiesActivity::class.intent.setUUID(uuid))
+        }
+    }
+
+    private suspend fun ensureProxyPanel(main: MainDesign) {
+        if (proxyDesign != null) return
+        recreateProxyPanel(main)
+    }
+
+    private suspend fun recreateProxyPanel(main: MainDesign) {
+        main.clearProxy()
+        proxyDesign = null
+
+        val mode = withClash { queryOverride(Clash.OverrideSlot.Session).mode }
+        val rawNames = withClash { queryProxyGroupNames(true) }
+        val names = ProxyDesign.liteGroupNames(rawNames)
+        val states = List(names.size) { ProxyState("?") }
+
+        proxyNames = names
+        proxyStates = states
+
+        val design = ProxyDesign(this, mode, names, uiStore)
+        design.onUrlTestingChanged = { testing ->
+            launch { main.setUrlTesting(testing) }
+        }
+        proxyDesign = design
+        main.attachProxy(design.root)
+        design.requests.trySend(ProxyDesign.Request.ReloadAll)
+    }
+
+    private suspend fun handleProxyRequest(main: MainDesign, req: ProxyDesign.Request) {
+        val design = proxyDesign ?: return
+        val names = proxyNames
+        val states = proxyStates
+        when (req) {
+            ProxyDesign.Request.ReLaunch -> recreateProxyPanel(main)
+            ProxyDesign.Request.ReloadAll -> {
+                names.indices.forEach { idx ->
+                    design.requests.trySend(ProxyDesign.Request.Reload(idx))
+                }
+            }
+            is ProxyDesign.Request.Reload -> {
+                if (req.index !in names.indices) return
+                launch {
+                    val group = reloadLock.withPermit {
+                        withClash {
+                            queryProxyGroup(names[req.index], ProxySort.Delay)
+                        }
+                    }
+                    val state = states[req.index]
+                    state.now = group.now
+                    design.updateGroup(
+                        req.index,
+                        group.proxies,
+                        group.type == "Selector",
+                        state,
+                        names.indices.map { names[it] to states[it] }.toMap()
+                    )
+                }
+            }
+            is ProxyDesign.Request.Select -> {
+                if (req.index !in names.indices) return
+                withClash {
+                    patchSelector(names[req.index], req.name)
+                    states[req.index].now = req.name
+                }
+                design.requestRedrawVisible()
+            }
+            is ProxyDesign.Request.UrlTest -> {
+                if (req.index !in names.indices) return
+                launch {
+                    withClash { healthCheck(names[req.index]) }
+                    val group = withClash {
+                        queryProxyGroup(names[req.index], ProxySort.Delay)
+                    }
+                    val best = group.proxies
+                        .asSequence()
+                        .filter { !it.isGroup && it.delay > 0 }
+                        .minByOrNull { it.delay }
+                    if (best != null && group.type == "Selector") {
+                        withClash {
+                            patchSelector(names[req.index], best.name)
+                        }
+                        states[req.index].now = best.name
+                    }
+                    design.requests.send(ProxyDesign.Request.Reload(req.index))
+                }
+            }
+            is ProxyDesign.Request.PatchMode -> Unit
         }
     }
 
@@ -103,9 +222,6 @@ class MainActivity : BaseActivity<MainDesign>() {
         withClash { setForwarded(queryTrafficTotal()) }
     }
 
-    /**
-     * 点订阅：未启用则启用并开代理；已启用且代理开着则关闭；已启用但代理关着则再开。
-     */
     private suspend fun MainDesign.toggleSubscription(profile: Profile) {
         if (!profile.imported) {
             requestSave(profile)
@@ -123,9 +239,6 @@ class MainActivity : BaseActivity<MainDesign>() {
         }
     }
 
-    /**
-     * 更新订阅节点/流量。VPN 已开时走当前隧道（多订阅互刷）；结果经 onProfileUpdate* 回调提示。
-     */
     private suspend fun MainDesign.updateSubscription(profile: Profile) {
         if (!profile.imported || profile.type == Profile.Type.File) {
             return

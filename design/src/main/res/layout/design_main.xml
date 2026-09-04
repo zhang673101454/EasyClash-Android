@@ -29,6 +29,9 @@
             name="homeTab"
             type="boolean" />
         <variable
+            name="urlTesting"
+            type="boolean" />
+        <variable
             name="appVersion"
             type="String" />
         <variable
@@ -102,6 +105,28 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
+                <FrameLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="@{homeTab ? View.GONE : View.VISIBLE}">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/delay_test"
+                        android:onClick="@{() -> self.requestUrlTest()}"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_baseline_sync"
+                        android:visibility="@{urlTesting ? View.GONE : View.VISIBLE}" />
+
+                    <ProgressBar
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:visibility="@{urlTesting ? View.VISIBLE : View.GONE}" />
+                </FrameLayout>
+
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
@@ -109,7 +134,8 @@
                     android:contentDescription="@string/_new"
                     android:onClick="@{() -> self.requestCreate()}"
                     android:padding="8dp"
-                    android:src="@drawable/ic_baseline_add" />
+                    android:src="@drawable/ic_baseline_add"
+                    android:visibility="@{homeTab ? View.VISIBLE : View.GONE}" />
             </LinearLayout>
 
             <LinearLayout
@@ -147,14 +173,26 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <com.github.kr328.clash.design.view.AppRecyclerView
-                android:id="@+id/profile_list"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:clipToPadding="false"
-                android:paddingBottom="36dp"
-                android:scrollbars="none" />
+                android:layout_weight="1">
+
+                <com.github.kr328.clash.design.view.AppRecyclerView
+                    android:id="@+id/profile_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="36dp"
+                    android:scrollbars="none"
+                    android:visibility="@{homeTab ? View.VISIBLE : View.GONE}" />
+
+                <FrameLayout
+                    android:id="@+id/proxy_host"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="@{homeTab ? View.GONE : View.VISIBLE}" />
+            </FrameLayout>
         </LinearLayout>
 
         <LinearLayout

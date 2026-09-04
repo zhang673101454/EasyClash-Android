@@ -1,6 +1,5 @@
 package com.github.kr328.clash.design
 
-import android.app.Dialog
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +9,6 @@ import com.github.kr328.clash.core.util.trafficTotal
 import com.github.kr328.clash.design.adapter.ProfileAdapter
 import com.github.kr328.clash.design.databinding.DesignAboutBinding
 import com.github.kr328.clash.design.databinding.DesignMainBinding
-import com.github.kr328.clash.design.databinding.DialogProfilesMenuBinding
-import com.github.kr328.clash.design.dialog.AppBottomSheetDialog
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.design.util.applyLinearAdapter
 import com.github.kr328.clash.design.util.layoutInflater
@@ -22,12 +19,12 @@ import com.github.kr328.clash.service.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MainDesign(context: Context) : Design<MainDesign.Request>(context), ProfileMenuHandler {
+class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
     sealed class Request {
         object OpenProxy : Request()
         object ShowHome : Request()
         object Create : Request()
-        object UpdateAll : Request()
+        object UrlTest : Request()
         data class Active(val profile: Profile) : Request()
         data class Update(val profile: Profile) : Request()
         data class Edit(val profile: Profile) : Request()
@@ -37,7 +34,13 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
     private val binding = DesignMainBinding
         .inflate(context.layoutInflater, context.root, false)
 
-    private val adapter = ProfileAdapter(context, this::requestActive, this::showMenu)
+    private val adapter = ProfileAdapter(
+        context,
+        onClicked = { requests.trySend(Request.Active(it)) },
+        onUpdate = { requests.trySend(Request.Update(it)) },
+        onEdit = { requests.trySend(Request.Edit(it)) },
+        onDelete = { requests.trySend(Request.Delete(it)) },
+    )
 
     override val root: View
         get() = binding.root
@@ -45,6 +48,8 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
     suspend fun setClashRunning(running: Boolean) {
         withContext(Dispatchers.Main) {
             binding.clashRunning = running
+            adapter.clashRunning = running
+            adapter.notifyDataSetChanged()
         }
     }
 
@@ -66,7 +71,35 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
         }
     }
 
+    suspend fun setUrlTesting(testing: Boolean) {
+        withContext(Dispatchers.Main) {
+            binding.urlTesting = testing
+        }
+    }
+
+    suspend fun attachProxy(view: View) {
+        withContext(Dispatchers.Main) {
+            val host = binding.proxyHost
+            host.removeAllViews()
+            (view.parent as? ViewGroup)?.removeView(view)
+            host.addView(
+                view,
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+    }
+
+    suspend fun clearProxy() {
+        withContext(Dispatchers.Main) {
+            binding.proxyHost.removeAllViews()
+        }
+    }
+
     suspend fun patchProfiles(profiles: List<Profile>) {
+        adapter.clashRunning = binding.clashRunning
         adapter.patchDataSet(adapter::profiles, profiles, id = { it.uuid })
     }
 
@@ -94,6 +127,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
     init {
         binding.self = this
         binding.homeTab = true
+        binding.urlTesting = false
         binding.mode = context.getString(R.string.smart_mode)
         binding.appAuthor = context.getString(R.string.app_author)
         binding.appVersion = context.getString(R.string.app_version)
@@ -102,11 +136,6 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
         binding.profileList.applyLinearAdapter(context, adapter)
     }
 
-    fun request(request: Request) {
-        requests.trySend(request)
-    }
-
-    /** 布局点击：避免 DataBinding 直接引用 sealed object（需 .INSTANCE，kapt 易挂）。 */
     fun requestShowHome() {
         requests.trySend(Request.ShowHome)
     }
@@ -119,37 +148,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context), Profil
         requests.trySend(Request.Create)
     }
 
-    private fun requestActive(profile: Profile) {
-        requests.trySend(Request.Active(profile))
-    }
-
-    private fun showMenu(profile: Profile) {
-        val dialog = AppBottomSheetDialog(context)
-        val menuBinding = DialogProfilesMenuBinding
-            .inflate(context.layoutInflater, dialog.window?.decorView as ViewGroup?, false)
-        menuBinding.master = this
-        menuBinding.self = dialog
-        menuBinding.profile = profile
-        dialog.setContentView(menuBinding.root)
-        dialog.show()
-    }
-
-    override fun requestUpdate(dialog: Dialog, profile: Profile) {
-        requests.trySend(Request.Update(profile))
-        dialog.dismiss()
-    }
-
-    override fun requestEdit(dialog: Dialog, profile: Profile) {
-        requests.trySend(Request.Edit(profile))
-        dialog.dismiss()
-    }
-
-    override fun requestDuplicate(dialog: Dialog, profile: Profile) {
-        dialog.dismiss()
-    }
-
-    override fun requestDelete(dialog: Dialog, profile: Profile) {
-        requests.trySend(Request.Delete(profile))
-        dialog.dismiss()
+    fun requestUrlTest() {
+        requests.trySend(Request.UrlTest)
     }
 }

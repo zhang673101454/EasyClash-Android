@@ -3,13 +3,10 @@ package com.github.kr328.clash.design
 import android.app.Dialog
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.github.kr328.clash.design.adapter.ProfileAdapter
 import com.github.kr328.clash.design.databinding.DesignProfilesBinding
-import com.github.kr328.clash.design.databinding.DialogProfilesMenuBinding
-import com.github.kr328.clash.design.dialog.AppBottomSheetDialog
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.design.util.*
 import com.github.kr328.clash.service.model.Profile
@@ -29,14 +26,20 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
 
     private val binding = DesignProfilesBinding
         .inflate(context.layoutInflater, context.root, false)
-    private val adapter = ProfileAdapter(context, this::requestActive, this::showMenu)
+    private val adapter = ProfileAdapter(
+        context,
+        onClicked = { requests.trySend(Request.Active(it)) },
+        onUpdate = { requests.trySend(Request.Update(it)) },
+        onEdit = { requests.trySend(Request.Edit(it)) },
+        onDelete = { requests.trySend(Request.Delete(it)) },
+    )
 
     private var allUpdating: Boolean
-        get() = adapter.states.allUpdating;
+        get() = adapter.states.allUpdating
         set(value) {
             adapter.states.allUpdating = value
         }
-    private val rotateAnimation : Animation = AnimationUtils.loadAnimation(context, R.anim.rotate_infinite)
+    private val rotateAnimation: Animation = AnimationUtils.loadAnimation(context, R.anim.rotate_infinite)
 
     override val root: View
         get() = binding.root
@@ -78,28 +81,14 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
         }
     }
 
-    private fun showMenu(profile: Profile) {
-        val dialog = AppBottomSheetDialog(context)
-
-        val binding = DialogProfilesMenuBinding
-            .inflate(context.layoutInflater, dialog.window?.decorView as ViewGroup?, false)
-
-        binding.master = this
-        binding.self = dialog
-        binding.profile = profile
-
-        dialog.setContentView(binding.root)
-        dialog.show()
-    }
-
     fun requestUpdateAll() {
-        allUpdating = true;
+        allUpdating = true
         changeUpdateAllButtonStatus()
         requests.trySend(Request.UpdateAll)
     }
 
     fun finishUpdateAll() {
-        allUpdating = false;
+        allUpdating = false
         changeUpdateAllButtonStatus()
     }
 
@@ -107,31 +96,23 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
         requests.trySend(Request.Create)
     }
 
-    private fun requestActive(profile: Profile) {
-        requests.trySend(Request.Active(profile))
-    }
-
     override fun requestUpdate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Update(profile))
-
         dialog.dismiss()
     }
 
     override fun requestEdit(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Edit(profile))
-
         dialog.dismiss()
     }
 
     override fun requestDuplicate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Duplicate(profile))
-
         dialog.dismiss()
     }
 
     override fun requestDelete(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Delete(profile))
-
         dialog.dismiss()
     }
 

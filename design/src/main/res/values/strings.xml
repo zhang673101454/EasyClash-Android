@@ -24,8 +24,10 @@
     <string name="tab_nodes">节点</string>
     <string name="connection_mode">连接方式</string>
     <string name="smart_mode_desc">国内直连 · VPN</string>
-    <string name="badge_in_use">使用中</string>
-    <string name="badge_idle">待用</string>
+    <string name="badge_in_use">开启</string>
+    <string name="badge_idle">关闭</string>
+    <string name="badge_on">开启</string>
+    <string name="badge_off">关闭</string>
     <string name="manage_subscriptions">管理</string>
     <string name="subscription_card_hint">点此打开订阅列表 · 额度显示在各订阅上</string>
     <string name="subscription_refresh_need_proxy">刷新失败：请先点开一条可用订阅，再刷新被墙订阅</string>
@@ -56,9 +58,8 @@
     <string name="create_profile">添加订阅</string>
     <string name="file">File</string>
     <string name="import_from_file">Import from File</string>
-    <string name="url">URL</string>
     <string name="qr" translatable="false">QR Code</string>
-    <string name="import_from_url">粘贴订阅 URL</string>
+    <string name="import_from_url">粘贴订阅地址</string>
     <string name="import_from_qr">Import from QR Code</string>
     <string name="external">External</string>
     <string name="format_type_unsaved">%s (Unsaved)</string>
@@ -70,13 +71,14 @@
     <string name="github_releases">Github Releases</string>
 
     <string name="profile">订阅</string>
-    <string name="name">Name</string>
-    <string name="profile_name">备注（可选）</string>
-    <string name="profile_url">订阅 URL</string>
+    <string name="name">备注名称</string>
+    <string name="profile_name">给订阅起个名字</string>
+    <string name="profile_url">订阅地址</string>
+    <string name="url">订阅地址</string>
     <string name="auto_update">Auto Update</string>
     <string name="auto_update_minutes">Auto Update (Minutes)</string>
 
-    <string name="accept_http_content">Accept only http(s)</string>
+    <string name="accept_http_content">https://...</string>
     <string name="at_least_15_minutes">At least 15 minutes or empty</string>
     <string name="age_secret_key">Age Secret Key</string>
     <string name="age_secret_key_hint">AGE-SECRET-KEY-… (optional)</string>

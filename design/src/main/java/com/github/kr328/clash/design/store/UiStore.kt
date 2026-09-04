@@ -43,17 +43,17 @@ class UiStore(context: Context) {
 
     var proxyExcludeNotSelectable by store.boolean(
         key = "proxy_exclude_not_selectable",
-        defaultValue = false,
+        defaultValue = true,
     )
 
     var proxyLine: Int by store.int(
         key = "proxy_line",
-        defaultValue = 2
+        defaultValue = 1
     )
 
     var proxySort: ProxySort by store.enum(
         key = "proxy_sort",
-        defaultValue = ProxySort.Default,
+        defaultValue = ProxySort.Delay,
         values = ProxySort.values()
     )
 

@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.design.databinding.AdapterProfileBinding
 import com.github.kr328.clash.design.model.ProfilePageState
-import com.github.kr328.clash.design.model.ProxyPageState
 import com.github.kr328.clash.design.ui.ObservableCurrentTime
 import com.github.kr328.clash.design.util.layoutInflater
 import com.github.kr328.clash.service.model.Profile
@@ -13,13 +12,16 @@ import com.github.kr328.clash.service.model.Profile
 class ProfileAdapter(
     private val context: Context,
     private val onClicked: (Profile) -> Unit,
-    private val onMenuClicked: (Profile) -> Unit,
+    private val onUpdate: (Profile) -> Unit,
+    private val onEdit: (Profile) -> Unit,
+    private val onDelete: (Profile) -> Unit,
 ) : RecyclerView.Adapter<ProfileAdapter.Holder>() {
     class Holder(val binding: AdapterProfileBinding) : RecyclerView.ViewHolder(binding.root)
 
     private val currentTime = ObservableCurrentTime()
 
     var profiles: List<Profile> = emptyList()
+    var clashRunning: Boolean = false
     val states = ProfilePageState()
 
     fun updateElapsed() {
@@ -38,15 +40,19 @@ class ProfileAdapter(
         val current = profiles[position]
         val binding = holder.binding
 
-        if (current === binding.profile)
-            return
-
         binding.profile = current
+        binding.proxyOn = current.active && clashRunning
         binding.setClicked {
             onClicked(current)
         }
-        binding.setMenu {
-            onMenuClicked(current)
+        binding.setUpdate {
+            onUpdate(current)
+        }
+        binding.setEdit {
+            onEdit(current)
+        }
+        binding.setDelete {
+            onDelete(current)
         }
     }
 
