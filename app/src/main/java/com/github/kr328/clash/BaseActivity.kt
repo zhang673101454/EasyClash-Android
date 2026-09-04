@@ -189,11 +189,8 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
     }
 
     private fun queryDayNight(config: Configuration = resources.configuration): DayNight {
-        return when (uiStore.darkMode) {
-            DarkMode.Auto -> if (config.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) DayNight.Night else DayNight.Day
-            DarkMode.ForceLight -> DayNight.Day
-            DarkMode.ForceDark -> DayNight.Night
-        }
+        // EasyClash：固定浅色，无设置入口
+        return DayNight.Day
     }
 
     private fun applyDayNight(config: Configuration = resources.configuration) {

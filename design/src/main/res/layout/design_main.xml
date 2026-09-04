@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="self"
@@ -48,7 +47,7 @@
             android:paddingTop="@{self.surface.insets.top}"
             android:paddingBottom="@{self.surface.insets.bottom}">
 
-            <!-- TitleBar -->
+            <!-- TitleBar：Logo + 名 + 状态点 + 智能模式 · 右上角仅 + -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -94,9 +93,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
+                        android:text="@{mode}"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -105,13 +102,13 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/settings"
-                    android:onClick="@{() -> self.request(Request.OpenSettings)}"
+                    android:contentDescription="@string/_new"
+                    android:onClick="@{() -> self.request(Request.OpenNewProfile)}"
                     android:padding="8dp"
-                    android:src="@drawable/ic_baseline_settings" />
+                    android:src="@drawable/ic_baseline_add" />
             </LinearLayout>
 
-            <!-- TabBar: 连接 | 节点 -->
+            <!-- Tab：连接 | 节点 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -147,100 +144,44 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <ScrollView
+            <!-- 主体：进订阅列表（额度在各订阅卡上） -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:scrollbars="none">
+                android:onClick="@{() -> self.request(Request.OpenProfiles)}">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@{clashRunning ? @drawable/bg_ec_card_active : @drawable/bg_ec_card}"
                     android:orientation="vertical"
-                    android:paddingHorizontal="16dp"
-                    android:paddingBottom="24dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/connection_mode"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                    android:padding="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_ec_mode"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="14dp">
+                        android:orientation="horizontal">
 
-                        <LinearLayout
+                        <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{mode}"
-                                android:textColor="@color/color_clash_light"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="@string/smart_mode_desc"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- 开关卡：点一下开/关代理 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="@{clashRunning ? @drawable/bg_ec_card_active : @drawable/bg_ec_card}"
-                        android:gravity="center_vertical"
-                        android:onClick="@{() -> self.request(Request.ToggleStatus)}"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{clashRunning ? @string/running : @string/stopped}"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="12sp" />
-                        </LinearLayout>
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="@{profileName != null ? profileName : @string/not_selected}"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@{clashRunning ? @drawable/bg_ec_badge_on : @drawable/bg_ec_badge_off}"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="3dp"
                             android:text="@{clashRunning ? @string/badge_in_use : @string/badge_idle}"
                             android:textColor="@{clashRunning ? @color/color_clash_light : ?android:attr/textColorSecondary}"
                             android:textSize="11sp" />
@@ -249,57 +190,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="18dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/profiles"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/subscription_card_hint"
                         android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <!-- 当前订阅卡 → 进订阅页（桌面：点订阅即用） -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@{clashRunning ? @drawable/bg_ec_card_active : @drawable/bg_ec_card}"
-                        android:onClick="@{() -> self.request(Request.OpenProfiles)}"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:text="@{profileName != null ? profileName : @string/not_selected}"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/manage_subscriptions"
-                                android:textColor="@color/color_clash_light"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="@string/subscription_card_hint"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                        android:textSize="12sp" />
                 </LinearLayout>
-            </ScrollView>
+            </FrameLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

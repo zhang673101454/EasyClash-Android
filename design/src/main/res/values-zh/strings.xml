@@ -65,7 +65,7 @@
     <string name="badge_in_use">使用中</string>
     <string name="badge_idle">待用</string>
     <string name="manage_subscriptions">管理</string>
-    <string name="subscription_card_hint">点此管理订阅，选中后回主页开启代理</string>
+    <string name="subscription_card_hint">点此打开订阅列表 · 额度显示在各订阅上</string>
     <string name="profile_url">订阅 URL</string>
     <string name="properties">参数</string>
     <string name="proxy">节点</string>

@@ -24,6 +24,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         OpenHelp,
         OpenAbout,
         ShowHome,
+        OpenNewProfile,
     }
 
     private val binding = DesignMainBinding
