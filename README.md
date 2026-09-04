@@ -1,87 +1,41 @@
-## Clash Meta for Android
+# EasyClash Android
 
-A Graphical user interface of [Clash.Meta](https://github.com/MetaCubeX/Clash.Meta) for Android
+EasyClash 的 Android 客户端，基于 [Clash Meta for Android](https://github.com/MetaCubeX/ClashMetaForAndroid) 精简改造。
 
-### Feature
+极简代理：点订阅即用，智能分流，双订阅互拉（与 [EasyClash 桌面版](https://github.com/zhang673101454/EasyClash) 同一产品思路）。
 
-Feature of [Clash.Meta](https://github.com/MetaCubeX/Clash.Meta)
+## 功能
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/com.github.metacubex.clash.meta/)
+- 订阅 URL 添加 / 编辑 / 刷新 / 流量显示
+- 一键开/关代理（Android VPN）
+- 节点列表与切换
+- 智能模式（`GEOSITE,cn` + `GEOIP,CN` 直连）
+- 已隐藏：日志、规则提供者、高级网络/TUN 选项、文件/二维码导入
 
-### Requirement
+## 下载
 
-- Android 5.0+ (minimum)
-- Android 7.0+ (recommend)
-- `armeabi-v7a` , `arm64-v8a`, `x86` or `x86_64` Architecture
+[GitHub Releases](https://github.com/zhang673101454/EasyClash-Android/releases) — 推荐 **arm64-v8a** APK。
 
-### Build
+## 典型用法
 
-1. Update submodules
+1. 安装 APK，打开 EasyClash
+2. 点 **订阅** → **+** → 粘贴订阅 URL（可填备注）
+3. 选中订阅后回到主页，点卡片 **开启代理**
+4. 在 **节点** 里切换线路
 
-   ```bash
-   git submodule update --init --recursive
-   ```
+双订阅：先启用能用的订阅并开代理，再在另一条订阅里点更新。
 
-2. Install **OpenJDK 11**, **Android SDK**, **CMake** and **Golang**
+## 构建（可选）
 
-3. Create `local.properties` in project root with
+云端编译：push 到 `main` 后 GitHub Actions **Build Debug** 自动打包，或手动 Run workflow。
 
-   ```properties
-   sdk.dir=/path/to/android-sdk
-   ```
+本地需 OpenJDK 11+、Android SDK、Go、CMake：
 
-4. (Optional) Custom app package name. Add the following configuration to `local.properties`.
+```bash
+git submodule update --init --recursive
+./gradlew app:assembleAlphaRelease
+```
 
-   ```properties
-   # config your ownn applicationId, or it will be 'com.github.metacubex.clash'
-   custom.application.id=com.my.compile.clash
-   # remove application id suffix, or the applicaion id will be 'com.github.metacubex.clash.alpha'
-   remove.suffix=true
+## 许可
 
-5. Create `signing.properties` in project root with
-
-   ```properties
-   keystore.path=/path/to/keystore/file
-   keystore.password=<key store password>
-   key.alias=<key alias>
-   key.password=<key password>
-   ```
-
-6. Build
-
-   ```bash
-   ./gradlew app:assembleAlphaRelease
-   ```
-
-### Automation
-
-APP package name is `com.github.metacubex.clash.meta`
-
-- Toggle Clash.Meta service status
-  - Send intent to activity `com.github.kr328.clash.ExternalControlActivity` with action `com.github.metacubex.clash.meta.action.TOGGLE_CLASH`
-- Start Clash.Meta service
-  - Send intent to activity `com.github.kr328.clash.ExternalControlActivity` with action `com.github.metacubex.clash.meta.action.START_CLASH`
-- Stop Clash.Meta service
-  - Send intent to activity `com.github.kr328.clash.ExternalControlActivity` with action `com.github.metacubex.clash.meta.action.STOP_CLASH`
-- Import a profile
-  - URL Scheme `clash://install-config?url=<encoded URI>` or `clashmeta://install-config?url=<encoded URI>`
-
-### Contribution and Project Maintenance
-
-#### Meta Kernel
-
-- CMFA uses the kernel from `android-real` branch under `MetaCubeX/Clash.Meta`, which is a merge of the main `Alpha` branch and `android-open`.
-  - If you want to contribute to the kernel, make PRs to `Alpha` branch of the Meta kernel repository.
-  - If you want to contribute Android-specific patches to the kernel, make PRs to  `android-open` branch of the Meta kernel repository.
-
-#### Maintenance
-
-- When `MetaCubeX/Clash.Meta` kernel is updated to a new version, the `Update Dependencies` actions in this repo will be triggered automatically.
-  - It will pull the new version of the meta kernel, update all the golang dependencies, and create a PR without manual intervention.
-  - If there is any compile error in PR, you need to fix it before merging. Alternatively, you may merge the PR directly.
-- Manually triggering `Build Pre-Release` actions will compile and publish a `PreRelease` version.
-- Manually triggering `Build Release` actions will compile, tag and publish a `Release` version.
-  - You must fill the blank `Release Tag` with the tag you want to release in the format of `v1.2.3`.
-  - `versionName` and `versionCode` in `build.gradle.kts` will be automatically bumped to the tag you filled above.
+基于 CMFA（GPLv3）。修改版源码见本仓库。

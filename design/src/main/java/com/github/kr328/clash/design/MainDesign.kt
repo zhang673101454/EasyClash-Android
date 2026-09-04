@@ -51,12 +51,8 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
 
     suspend fun setMode(mode: TunnelState.Mode) {
         withContext(Dispatchers.Main) {
-            binding.mode = when (mode) {
-                TunnelState.Mode.Direct -> context.getString(R.string.direct_mode)
-                TunnelState.Mode.Global -> context.getString(R.string.global_mode)
-                TunnelState.Mode.Rule -> context.getString(R.string.rule_mode)
-                else -> context.getString(R.string.rule_mode)
-            }
+            // EasyClash 固定智能分流，不暴露规则/全局/TUN 切换
+            binding.mode = context.getString(R.string.smart_mode)
         }
     }
 

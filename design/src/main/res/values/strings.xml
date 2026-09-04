@@ -10,14 +10,15 @@
     <string name="format_traffic_forwarded">%s Forwarded</string>
 
     <string name="proxy">节点</string>
+    <string name="smart_mode">智能模式</string>
     <string name="direct_mode">Direct Mode</string>
     <string name="rule_mode">Rule Mode</string>
     <string name="global_mode">Global Mode</string>
     <string name="proxy_empty_tips">No groups can be displayed</string>
 
-    <string name="profiles">Profiles</string>
+    <string name="profiles">订阅</string>
     <string name="not_selected">Not selected</string>
-    <string name="format_profile_activated">%s Activated</string>
+    <string name="format_profile_activated">%s 使用中</string>
 
     <string name="logs">Logs</string>
     <string name="settings">设置</string>
@@ -37,12 +38,12 @@
     <string name="format_months_ago">%d months ago</string>
     <string name="format_years_ago">%d years ago</string>
 
-    <string name="create_profile">Create Profile</string>
+    <string name="create_profile">添加订阅</string>
     <string name="file">File</string>
     <string name="import_from_file">Import from File</string>
     <string name="url">URL</string>
     <string name="qr" translatable="false">QR Code</string>
-    <string name="import_from_url">Import from URL</string>
+    <string name="import_from_url">粘贴订阅 URL</string>
     <string name="import_from_qr">Import from QR Code</string>
     <string name="external">External</string>
     <string name="format_type_unsaved">%s (Unsaved)</string>
@@ -55,8 +56,8 @@
 
     <string name="profile">订阅</string>
     <string name="name">Name</string>
-    <string name="profile_name">Profile Name</string>
-    <string name="profile_url">Profile URL</string>
+    <string name="profile_name">备注（可选）</string>
+    <string name="profile_url">订阅 URL</string>
     <string name="auto_update">Auto Update</string>
     <string name="auto_update_minutes">Auto Update (Minutes)</string>
 
@@ -101,7 +102,7 @@
     <string name="initializing">Initializing</string>
     <string name="verifying">Verifying</string>
 
-    <string name="new_profile">New Profile</string>
+    <string name="new_profile">新订阅</string>
 
     <string name="delay">Delay</string>
     <string name="sort">Sort</string>

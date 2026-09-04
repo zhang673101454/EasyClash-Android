@@ -63,11 +63,13 @@
                         android:layout_width="@dimen/large_item_header_layout_size"
                         android:layout_height="@dimen/large_item_header_layout_size">
 
-                        <View
+                        <ImageView
                             android:layout_width="@dimen/main_logo_size"
                             android:layout_height="@dimen/main_logo_size"
                             android:layout_gravity="center"
-                            android:background="@drawable/ic_clash" />
+                            android:contentDescription="@string/application_name"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/easyclash_logo" />
                     </FrameLayout>
 
                     <TextView
