@@ -10,6 +10,8 @@ import com.github.kr328.clash.common.util.ticker
 import com.github.kr328.clash.design.ProfilesDesign
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.service.model.Profile
+import com.github.kr328.clash.util.startClashService
+import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -56,25 +58,22 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
                                     }
                                 }
                             }
-                        is ProfilesDesign.Request.Update ->
+                        is ProfilesDesign.Request.Update -> {
+                            if (!clashRunning) {
+                                design.showToast(
+                                    R.string.subscription_refresh_need_proxy,
+                                    ToastDuration.Long
+                                )
+                            }
                             withProfile { update(it.profile.uuid) }
+                        }
                         is ProfilesDesign.Request.Delete ->
                             withProfile { delete(it.profile.uuid) }
                         is ProfilesDesign.Request.Edit ->
                             startActivity(PropertiesActivity::class.intent.setUUID(it.profile.uuid))
-                        is ProfilesDesign.Request.Active -> {
-                            withProfile {
-                                if (it.profile.imported)
-                                    setActive(it.profile)
-                                else
-                                    design.requestSave(it.profile)
-                            }
-                        }
-                        is ProfilesDesign.Request.Duplicate -> {
-                            val uuid = withProfile { clone(it.profile.uuid) }
-
-                            startActivity(PropertiesActivity::class.intent.setUUID(uuid))
-                        }
+                        is ProfilesDesign.Request.Active ->
+                            design.toggleSubscription(it.profile)
+                        is ProfilesDesign.Request.Duplicate -> Unit
                     }
                 }
                 if (activityStarted) {
@@ -89,6 +88,34 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
     private suspend fun ProfilesDesign.fetch() {
         withProfile {
             patchProfiles(queryAll())
+        }
+    }
+
+    private suspend fun ProfilesDesign.toggleSubscription(profile: Profile) {
+        if (!profile.imported) {
+            requestSave(profile)
+            return
+        }
+        if (profile.active && clashRunning) {
+            stopClashService()
+            return
+        }
+        withProfile { setActive(profile) }
+        if (!clashRunning) {
+            val vpnRequest = startClashService()
+            try {
+                if (vpnRequest != null) {
+                    val result = startActivityForResult(
+                        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                        vpnRequest
+                    )
+                    if (result.resultCode == RESULT_OK) {
+                        startClashService()
+                    }
+                }
+            } catch (_: Exception) {
+                showToast(R.string.unable_to_start_vpn, ToastDuration.Long)
+            }
         }
     }
 

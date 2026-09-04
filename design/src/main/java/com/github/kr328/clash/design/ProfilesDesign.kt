@@ -16,7 +16,7 @@ import com.github.kr328.clash.service.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context) {
+class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context), ProfileMenuHandler {
     sealed class Request {
         object UpdateAll : Request()
         object Create : Request()
@@ -111,25 +111,25 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
         requests.trySend(Request.Active(profile))
     }
 
-    fun requestUpdate(dialog: Dialog, profile: Profile) {
+    override fun requestUpdate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Update(profile))
 
         dialog.dismiss()
     }
 
-    fun requestEdit(dialog: Dialog, profile: Profile) {
+    override fun requestEdit(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Edit(profile))
 
         dialog.dismiss()
     }
 
-    fun requestDuplicate(dialog: Dialog, profile: Profile) {
+    override fun requestDuplicate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Duplicate(profile))
 
         dialog.dismiss()
     }
 
-    fun requestDelete(dialog: Dialog, profile: Profile) {
+    override fun requestDelete(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Delete(profile))
 
         dialog.dismiss()

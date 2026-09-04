@@ -8,7 +8,7 @@
                 android:title="@string/not_selectable" />
         </menu>
     </item>
-    <item android:title="@string/mode">
+    <item android:title="@string/mode" android:visible="false">
         <menu>
             <group android:checkableBehavior="single">
                 <item

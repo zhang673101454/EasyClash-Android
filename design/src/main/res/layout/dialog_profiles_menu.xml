@@ -4,7 +4,7 @@
     <data>
         <variable
             name="master"
-            type="com.github.kr328.clash.design.ProfilesDesign" />
+            type="com.github.kr328.clash.design.ProfileMenuHandler" />
         <variable
             name="self"
             type="android.app.Dialog" />
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:onClick="@{() -> master.requestDuplicate(self, profile)}"
             android:padding="@dimen/bottom_sheet_menu_items_padding"
-            android:visibility="@{profile.imported ? View.VISIBLE : View.GONE}"
+            android:visibility="gone"
             app:icon="@drawable/ic_baseline_content_copy"
             app:text="@string/duplicate" />
 
