@@ -18,6 +18,7 @@ import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
 import com.github.kr328.clash.util.withProfile
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import java.util.UUID
 import java.util.concurrent.TimeUnit
