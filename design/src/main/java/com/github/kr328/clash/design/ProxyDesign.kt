@@ -101,7 +101,6 @@ class ProxyDesign(
         if (groupNames.isEmpty()) {
             binding.emptyView.visibility = View.VISIBLE
 
-            binding.reloadView.visibility = View.GONE
             binding.urlTestView.visibility = View.GONE
             binding.tabLayoutView.visibility = View.GONE
             binding.elevationView.visibility = View.GONE
@@ -153,15 +152,11 @@ class ProxyDesign(
     }
 
     fun requestUrlTesting() {
-        urlTesting = true
-
-        requests.trySend(Request.UrlTest(binding.pagesView.currentItem))
-
-        updateUrlTestButtonStatus()
-    }
-
-    fun requestReload() {
+        // 一键：刷新节点列表 + 测速
         requests.trySend(Request.ReloadAll)
+        urlTesting = true
+        requests.trySend(Request.UrlTest(binding.pagesView.currentItem))
+        updateUrlTestButtonStatus()
     }
 
     private fun updateUrlTestButtonStatus() {
