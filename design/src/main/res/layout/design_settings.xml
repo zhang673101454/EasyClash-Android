@@ -39,6 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> self.request(Request.StartNetwork)}"
+                    android:visibility="gone"
                     app:icon="@drawable/ic_baseline_dns"
                     app:text="@string/network" />
 
@@ -46,6 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> self.request(Request.StartOverride)}"
+                    android:visibility="gone"
                     app:icon="@drawable/ic_baseline_extension"
                     app:text="@string/override" />
 
@@ -53,6 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> self.request(Request.StartMetaFeature)}"
+                    android:visibility="gone"
                     app:icon="@drawable/ic_baseline_meta"
                     app:text="@string/meta_features" />
 

@@ -1,15 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PluralsCandidate">
-    <string name="launch_name_meta">Clash Meta</string>
-    <string name="launch_name_alpha">Clash Meta Alpha</string>
-    <string name="application_name_meta">Clash Meta for Android</string>
-    <string name="application_name_alpha">Clash Meta for Android Alpha</string>
+    <string name="launch_name_meta">EasyClash</string>
+    <string name="launch_name_alpha">EasyClash</string>
+    <string name="application_name_meta">EasyClash</string>
+    <string name="application_name_alpha">EasyClash</string>
 
-    <string name="stopped">Stopped</string>
-    <string name="tap_to_start">Tap to start</string>
-    <string name="running">Running</string>
+    <string name="stopped">已停止</string>
+    <string name="tap_to_start">点击开启代理</string>
+    <string name="running">运行中</string>
     <string name="format_traffic_forwarded">%s Forwarded</string>
 
-    <string name="proxy">Proxy</string>
+    <string name="proxy">节点</string>
     <string name="direct_mode">Direct Mode</string>
     <string name="rule_mode">Rule Mode</string>
     <string name="global_mode">Global Mode</string>
@@ -20,9 +20,9 @@
     <string name="format_profile_activated">%s Activated</string>
 
     <string name="logs">Logs</string>
-    <string name="settings">Settings</string>
+    <string name="settings">设置</string>
     <string name="help">Help</string>
-    <string name="about">About</string>
+    <string name="about">关于</string>
 
     <string name="copied">Copied</string>
 
@@ -53,7 +53,7 @@
     <string name="reinstall">Reinstall</string>
     <string name="github_releases">Github Releases</string>
 
-    <string name="profile">Profile</string>
+    <string name="profile">订阅</string>
     <string name="name">Name</string>
     <string name="profile_name">Profile Name</string>
     <string name="profile_url">Profile URL</string>
