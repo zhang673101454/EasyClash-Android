@@ -82,6 +82,13 @@
     }
     .node.on { border-color: var(--accent-border); background: var(--accent-soft); }
     .ms { font-size: 12px; color: var(--accent); font-weight: 600; }
+    .meta-corner {
+      position: absolute; right: 14px; bottom: 16px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+      font-size: 9px; color: var(--faint); opacity: 0.7; pointer-events: none;
+    }
+    .phone { position: relative; }
+    .toolbar-actions { display: flex; gap: 4px; }
     .form {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 14px; display: flex; flex-direction: column; gap: 10px;
@@ -136,7 +143,6 @@
             <span class="t11">2 分钟前</span>
           </div>
           <div class="progress"><i style="width:28%"></i></div>
-          <div class="t11" style="margin-top:6px">到期 2026-12-31</div>
         </div>
         <div class="card">
           <div class="row">
@@ -149,6 +155,10 @@
           </div>
           <div class="progress"><i style="width:6%"></i></div>
         </div>
+      </div>
+      <div class="meta-corner">
+        <span>by zhangnull</span>
+        <span>v1.0.0</span>
       </div>
     </div>
 
@@ -174,12 +184,14 @@
         <div class="logo"></div>
         <div class="brand">
           <div class="brand-row">
-            <span class="brand-name">EasyClash</span>
-            <span class="dot on"></span>
+            <span class="brand-name">节点</span>
           </div>
           <div class="mode-line">智能模式</div>
         </div>
-        <button class="icon-btn" type="button" onclick="go('add')">＋</button>
+        <div class="toolbar-actions">
+          <button class="icon-btn" type="button" title="刷新">⟳</button>
+          <button class="icon-btn" type="button" title="测速">⚡</button>
+        </div>
       </div>
       <div class="picker">
         <button type="button" onclick="go('home')">连接</button>

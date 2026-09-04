@@ -85,6 +85,8 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
     init {
         binding.self = this
         binding.homeTab = true
+        binding.appAuthor = context.getString(R.string.app_author)
+        binding.appVersion = context.getString(R.string.app_version)
 
         binding.colorClashStarted = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
         binding.colorClashStopped = context.resolveThemedColor(R.attr.colorClashStopped)

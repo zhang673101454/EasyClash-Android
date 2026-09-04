@@ -101,6 +101,7 @@ class ProxyDesign(
         if (groupNames.isEmpty()) {
             binding.emptyView.visibility = View.VISIBLE
 
+            binding.reloadView.visibility = View.GONE
             binding.urlTestView.visibility = View.GONE
             binding.tabLayoutView.visibility = View.GONE
             binding.elevationView.visibility = View.GONE
@@ -157,6 +158,10 @@ class ProxyDesign(
         requests.trySend(Request.UrlTest(binding.pagesView.currentItem))
 
         updateUrlTestButtonStatus()
+    }
+
+    fun requestReload() {
+        requests.trySend(Request.ReloadAll)
     }
 
     private fun updateUrlTestButtonStatus() {

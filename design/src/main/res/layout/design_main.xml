@@ -28,6 +28,12 @@
         <variable
             name="homeTab"
             type="boolean" />
+        <variable
+            name="appVersion"
+            type="String" />
+        <variable
+            name="appAuthor"
+            type="String" />
 
         <import type="android.view.View" />
         <import type="com.github.kr328.clash.design.MainDesign.Request" />
@@ -196,6 +202,34 @@
                         android:textSize="12sp" />
                 </LinearLayout>
             </FrameLayout>
+        </LinearLayout>
+
+        <!-- 右下角作者 / 版本，对齐桌面 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:alpha="0.45"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:paddingEnd="12dp"
+            android:paddingBottom="@{self.surface.insets.bottom + 12}"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/app_meta_author(appAuthor)}"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="9sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/app_meta_version(appVersion)}"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="9sp" />
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
