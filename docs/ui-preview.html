@@ -1,39 +1,45 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EasyClash Android · UI 预览</title>
+  <title>EasyClash Android Preview</title>
   <style>
     :root {
-      --bg: #f4f6f8; --card: #fff; --text: #0f172a; --muted: #475569; --faint: #94a3b8;
+      --bg: #f4f6f8; --card: #fff; --text: #0f172a; --muted: #64748b; --faint: #94a3b8;
       --accent: #0891b2; --accent-soft: rgba(8,145,178,.1); --accent-border: rgba(8,145,178,.28);
       --border: rgba(15,23,42,.07); --radius: 14px;
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh; font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-      background: linear-gradient(160deg,#e8eef2,#eef2f5); color: var(--text);
-      display: flex; flex-direction: column; align-items: center; padding: 32px 16px 48px; gap: 14px;
+      margin: 0; min-height: 100vh;
+      font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background: linear-gradient(160deg, #dbe7ef 0%, #eef2f5 50%, #e8eef2 100%);
+      color: var(--text);
+      padding: 20px 12px 32px;
     }
-    h1 { margin: 0; font-size: 15px; font-weight: 600; color: var(--muted); }
-    .hint { margin: 0; font-size: 12px; color: var(--faint); text-align: center; max-width: 360px; }
-    .tabs-bar { display: flex; gap: 8px; }
-    .tabs-bar button {
-      border: 1px solid var(--border); background: #fff; border-radius: 999px;
-      padding: 6px 14px; font-size: 12px; cursor: pointer; color: var(--muted);
+    .page-title { text-align: center; margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+    .page-sub { text-align: center; margin: 0 0 18px; font-size: 12px; color: var(--muted); }
+    .phones {
+      display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; align-items: flex-start;
     }
-    .tabs-bar button.on { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); font-weight: 600; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+    .col h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--muted); }
     .phone {
-      width: 360px; height: 720px; background: var(--bg); border-radius: 28px;
-      box-shadow: 0 0 0 10px #1e293b, 0 0 0 12px #334155, 0 24px 48px rgba(15,23,42,.18);
-      overflow: hidden; display: flex; flex-direction: column;
+      width: 230px; height: 470px; background: var(--bg); border-radius: 20px;
+      box-shadow: 0 0 0 7px #1e293b, 0 0 0 9px #334155, 0 14px 28px rgba(15,23,42,.16);
+      overflow: hidden; display: flex; flex-direction: column; position: relative;
     }
-    .notch { height: 28px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--faint); }
-    .screen { flex: 1; overflow: auto; padding: 0 16px 24px; display: none; flex-direction: column; }
-    .screen.on { display: flex; }
-    .titlebar { display: flex; align-items: center; gap: 10px; height: 48px; }
-    .logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg,#0891b2,#22d3ee); flex-shrink: 0; }
+    .notch {
+      height: 26px; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--faint); flex-shrink: 0;
+    }
+    .screen { flex: 1; padding: 0 14px 20px; display: flex; flex-direction: column; overflow: hidden; }
+    .titlebar { display: flex; align-items: center; gap: 10px; height: 48px; flex-shrink: 0; }
+    .logo {
+      width: 28px; height: 28px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(15,23,42,.08);
+    }
     .brand { flex: 1; min-width: 0; }
     .brand-row { display: flex; align-items: center; gap: 8px; }
     .brand-name { font-size: 14px; font-weight: 700; }
@@ -41,174 +47,185 @@
     .dot.on { background: var(--accent); }
     .mode-line { font-size: 11px; color: var(--faint); }
     .icon-btn {
-      width: 40px; height: 40px; border: 0; background: transparent; border-radius: 10px;
-      cursor: pointer; color: var(--accent); font-size: 22px; line-height: 1;
+      width: 36px; height: 36px; border: 0; background: transparent; border-radius: 10px;
+      color: var(--accent); font-size: 20px; line-height: 1; display: grid; place-items: center;
     }
     .picker {
-      display: flex; background: rgba(15,23,42,.04); border-radius: 12px; padding: 3px;
-      margin: 4px 0 14px; height: 40px; flex-shrink: 0;
+      display: flex; background: rgba(15,23,42,.045); border-radius: 12px; padding: 3px;
+      margin: 4px 0 12px; height: 40px; flex-shrink: 0;
     }
-    .picker button {
-      flex: 1; border: 0; background: transparent; border-radius: 10px;
-      font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer;
+    .picker span {
+      flex: 1; display: grid; place-items: center; border-radius: 10px;
+      font-size: 13px; font-weight: 700; color: var(--muted);
     }
-    .picker button.on {
+    .picker span.on {
       background: #fff; color: var(--accent); border: 1px solid var(--accent-border);
       box-shadow: 0 1px 2px rgba(15,23,42,.06);
     }
-    .list { display: flex; flex-direction: column; gap: 10px; }
+    .list { display: flex; flex-direction: column; gap: 10px; overflow: auto; }
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 14px; cursor: pointer;
+      padding: 14px;
     }
-    .card.active { background: var(--accent-soft); border: 1.5px solid var(--accent-border); }
+    .card.on { background: var(--accent-soft); border: 1.5px solid var(--accent-border); }
     .row { display: flex; align-items: center; gap: 8px; }
-    .grow { flex: 1; min-width: 0; }
-    .t14 { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .t12 { font-size: 12px; color: var(--muted); }
-    .t11 { font-size: 11px; color: var(--faint); }
+    .grow { flex: 1; min-width: 0; font-size: 14px; font-weight: 700;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .badge {
-      font-size: 11px; padding: 3px 8px; border-radius: 999px;
-      background: rgba(15,23,42,.06); color: var(--muted); white-space: nowrap;
+      font-size: 11px; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+      background: rgba(15,23,42,.06); color: var(--muted);
     }
     .badge.on { background: var(--accent-soft); color: var(--accent); }
-    .meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+    .meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px;
+      font-size: 12px; color: var(--muted); }
+    .meta .t11 { font-size: 11px; color: var(--faint); }
     .progress { height: 4px; background: rgba(15,23,42,.06); border-radius: 999px; margin-top: 8px; overflow: hidden; }
     .progress > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+    .actions { display: flex; justify-content: flex-end; gap: 2px; margin-top: 10px; }
+    .actions i {
+      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px;
+      color: var(--muted); font-style: normal; font-size: 14px;
+    }
     .node {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+      padding: 13px 14px; border-radius: 12px; border: 1px solid var(--border);
       background: #fff; margin-bottom: 8px; font-size: 13px;
     }
-    .node.on { border-color: var(--accent-border); background: var(--accent-soft); }
+    .node.sel { border-color: var(--accent-border); background: var(--accent-soft); }
     .ms { font-size: 12px; color: var(--accent); font-weight: 600; }
+    .ms.bad { color: #e11d48; }
     .meta-corner {
-      position: absolute; right: 14px; bottom: 16px;
+      position: absolute; right: 14px; bottom: 14px;
       display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
-      font-size: 9px; color: var(--faint); opacity: 0.7; pointer-events: none;
+      font-size: 9px; color: var(--faint); opacity: .55; pointer-events: none;
     }
-    .phone { position: relative; }
-    .toolbar-actions { display: flex; gap: 4px; }
-    .form {
+    .form-block {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+      padding: 16px; display: flex; flex-direction: column; gap: 12px; margin-top: 8px;
     }
-    .form label { font-size: 11px; font-weight: 600; color: var(--muted); }
-    .form input {
-      border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; outline: none;
+    .form-block label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .field {
+      border: 1px solid var(--border); border-radius: 12px; padding: 11px 12px;
+      font-size: 13px; background: #fff; color: var(--text);
     }
-    .form .ok {
-      border: 0; border-radius: 12px; padding: 10px; background: var(--accent);
-      color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+    .bar-back {
+      display: flex; align-items: center; gap: 8px; height: 48px; flex-shrink: 0;
+      font-size: 14px; font-weight: 700;
+    }
+    .save {
+      margin-left: auto; width: 36px; height: 36px; display: grid; place-items: center;
+      color: var(--accent); font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>EasyClash Android · 精简预览</h1>
-  <p class="hint">固定浅色 · 通知栏流量默认开 · 无设置 · 右上角 + 添加订阅 · 额度在订阅卡上 · 状态用小点</p>
+  <h1 class="page-title">EasyClash Android · 整体预览</h1>
+  <p class="page-sub">连接 / 节点同页 Tab · 订阅仅地址+名称 · 节点单列按延迟 · 卡内直接操作</p>
 
-  <div class="tabs-bar">
-    <button type="button" class="on" data-page="home">连接</button>
-    <button type="button" data-page="add">添加</button>
-    <button type="button" data-page="nodes">节点</button>
+  <div class="phones">
+    <div class="col">
+      <h2>连接页</h2>
+      <div class="phone">
+        <div class="notch">9:41</div>
+        <div class="screen">
+          <div class="titlebar">
+            <img class="logo" src="easyclash_logo.png" alt="logo" />
+            <div class="brand">
+              <div class="brand-row">
+                <span class="brand-name">EasyClash</span>
+                <span class="dot on"></span>
+              </div>
+              <div class="mode-line">智能模式</div>
+            </div>
+            <div class="icon-btn">+</div>
+          </div>
+          <div class="picker">
+            <span class="on">连接</span>
+            <span>节点</span>
+          </div>
+          <div class="list">
+            <div class="card on">
+              <div class="row">
+                <div class="grow">adaxi · 主订阅</div>
+                <span class="badge on">开启</span>
+              </div>
+              <div class="meta">
+                <span>28.1 GB / 100 GB</span>
+                <span class="t11">2 分钟前</span>
+              </div>
+              <div class="progress"><i style="width:28%"></i></div>
+              <div class="actions"><i>↻</i><i>✎</i><i>×</i></div>
+            </div>
+            <div class="card">
+              <div class="row">
+                <div class="grow">备用订阅</div>
+                <span class="badge">关闭</span>
+              </div>
+              <div class="meta">
+                <span>3.2 GB / 50 GB</span>
+                <span class="t11">昨天</span>
+              </div>
+              <div class="progress"><i style="width:6%"></i></div>
+              <div class="actions"><i>↻</i><i>✎</i><i>×</i></div>
+            </div>
+          </div>
+        </div>
+        <div class="meta-corner"><span>by zhangnull</span><span>v1.0.0</span></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>新增订阅</h2>
+      <div class="phone">
+        <div class="notch">9:41</div>
+        <div class="screen">
+          <div class="bar-back">
+            <span style="color:var(--muted);font-weight:500;font-size:18px">←</span>
+            <span>添加订阅</span>
+            <span class="save">✓</span>
+          </div>
+          <div class="form-block">
+            <label>备注名称</label>
+            <div class="field">主订阅</div>
+            <label>订阅地址</label>
+            <div class="field">https://example.com/sub</div>
+          </div>
+        </div>
+        <div class="meta-corner"><span>by zhangnull</span><span>v1.0.0</span></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>节点页</h2>
+      <div class="phone">
+        <div class="notch">9:41</div>
+        <div class="screen">
+          <div class="titlebar">
+            <img class="logo" src="easyclash_logo.png" alt="logo" />
+            <div class="brand">
+              <div class="brand-row">
+                <span class="brand-name">EasyClash</span>
+                <span class="dot on"></span>
+              </div>
+              <div class="mode-line">智能模式</div>
+            </div>
+            <div class="icon-btn">⟳</div>
+          </div>
+          <div class="picker">
+            <span>连接</span>
+            <span class="on">节点</span>
+          </div>
+          <div class="list">
+            <div class="node sel"><span>香港 01</span><span class="ms">42 ms</span></div>
+            <div class="node"><span>日本 03</span><span class="ms">68 ms</span></div>
+            <div class="node"><span>美国 02</span><span class="ms">91 ms</span></div>
+            <div class="node"><span>新加坡 05</span><span class="ms">112 ms</span></div>
+            <div class="node"><span>台湾 01</span><span class="ms bad">超时</span></div>
+          </div>
+        </div>
+        <div class="meta-corner"><span>by zhangnull</span><span>v1.0.0</span></div>
+      </div>
+    </div>
   </div>
-
-  <div class="phone">
-    <div class="notch">9:41</div>
-
-    <div class="screen on" id="home">
-      <div class="titlebar">
-        <div class="logo"></div>
-        <div class="brand">
-          <div class="brand-row">
-            <span class="brand-name">EasyClash</span>
-            <span class="dot on"></span>
-          </div>
-          <div class="mode-line">智能模式</div>
-        </div>
-        <button class="icon-btn" type="button" title="添加订阅" onclick="go('add')">＋</button>
-      </div>
-      <div class="picker">
-        <button type="button" class="on">连接</button>
-        <button type="button" onclick="go('nodes')">节点</button>
-      </div>
-      <div class="list">
-        <div class="card active">
-          <div class="row">
-            <div class="grow t14">adaxi · 主订阅</div>
-            <span class="badge on">使用中</span>
-          </div>
-          <div class="meta">
-            <span class="t12">已用 28.1 GB / 总额 100 GB</span>
-            <span class="t11">2 分钟前</span>
-          </div>
-          <div class="progress"><i style="width:28%"></i></div>
-        </div>
-        <div class="card">
-          <div class="row">
-            <div class="grow t14">备用订阅</div>
-            <span class="badge">待用</span>
-          </div>
-          <div class="meta">
-            <span class="t12">已用 3.2 GB / 总额 50 GB</span>
-            <span class="t11">昨天</span>
-          </div>
-          <div class="progress"><i style="width:6%"></i></div>
-        </div>
-      </div>
-      <div class="meta-corner">
-        <span>by zhangnull</span>
-        <span>v1.0.0</span>
-      </div>
-    </div>
-
-    <div class="screen" id="add">
-      <div class="titlebar">
-        <div class="brand">
-          <div class="brand-name">添加订阅</div>
-          <div class="mode-line">粘贴 URL，可选备注</div>
-        </div>
-        <button class="icon-btn" type="button" style="color:var(--muted)" onclick="go('home')">✕</button>
-      </div>
-      <div class="form">
-        <label>订阅 URL</label>
-        <input type="url" placeholder="https://…" />
-        <label>备注（可选）</label>
-        <input type="text" placeholder="例如：主订阅" maxlength="40" />
-        <button class="ok" type="button" onclick="go('home')">确认添加</button>
-      </div>
-    </div>
-
-    <div class="screen" id="nodes">
-      <div class="titlebar">
-        <div class="logo"></div>
-        <div class="brand">
-          <div class="brand-row">
-            <span class="brand-name">节点</span>
-          </div>
-          <div class="mode-line">智能模式</div>
-        </div>
-        <div class="toolbar-actions">
-          <button class="icon-btn" type="button" title="刷新并测速">⟳</button>
-        </div>
-      </div>
-      <div class="picker">
-        <button type="button" onclick="go('home')">连接</button>
-        <button type="button" class="on">节点</button>
-      </div>
-      <div class="node on"><span>香港 01</span><span class="ms">42 ms</span></div>
-      <div class="node"><span>日本 03</span><span class="ms">68 ms</span></div>
-      <div class="node"><span>新加坡 02</span><span class="ms" style="color:#e11d48">超时</span></div>
-    </div>
-  </div>
-
-  <script>
-    function go(id) {
-      document.querySelectorAll('.tabs-bar button').forEach((b) => b.classList.toggle('on', b.dataset.page === id));
-      document.querySelectorAll('.screen').forEach((s) => s.classList.remove('on'));
-      document.getElementById(id).classList.add('on');
-    }
-    document.querySelectorAll('.tabs-bar button').forEach((btn) => btn.addEventListener('click', () => go(btn.dataset.page)));
-  </script>
 </body>
 </html>
