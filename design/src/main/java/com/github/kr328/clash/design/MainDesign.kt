@@ -23,6 +23,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         OpenSettings,
         OpenHelp,
         OpenAbout,
+        ShowHome,
     }
 
     private val binding = DesignMainBinding
@@ -62,6 +63,12 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         }
     }
 
+    suspend fun setHomeTab(home: Boolean) {
+        withContext(Dispatchers.Main) {
+            binding.homeTab = home
+        }
+    }
+
     suspend fun showAbout(versionName: String) {
         withContext(Dispatchers.Main) {
             val binding = DesignAboutBinding.inflate(context.layoutInflater).apply {
@@ -76,6 +83,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
 
     init {
         binding.self = this
+        binding.homeTab = true
 
         binding.colorClashStarted = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
         binding.colorClashStopped = context.resolveThemedColor(R.attr.colorClashStopped)

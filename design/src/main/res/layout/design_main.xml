@@ -26,6 +26,9 @@
         <variable
             name="hasProviders"
             type="boolean" />
+        <variable
+            name="homeTab"
+            type="boolean" />
 
         <import type="android.view.View" />
         <import type="com.github.kr328.clash.design.MainDesign.Request" />
@@ -34,124 +37,269 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground"
         android:paddingStart="@{self.surface.insets.start}"
         android:paddingEnd="@{self.surface.insets.end}">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="none">
+            android:orientation="vertical"
+            android:paddingTop="@{self.surface.insets.top}"
+            android:paddingBottom="@{self.surface.insets.bottom}">
 
+            <!-- TitleBar -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:clipToPadding="false"
-                android:orientation="vertical"
-                android:paddingHorizontal="@dimen/main_padding_horizontal"
-                android:paddingTop="@{self.surface.insets.top}"
-                android:paddingBottom="@{self.surface.insets.bottom}">
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="@string/application_name"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/easyclash_logo" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:minHeight="@dimen/main_top_banner_height"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <FrameLayout
-                        android:layout_width="@dimen/large_item_header_layout_size"
-                        android:layout_height="@dimen/large_item_header_layout_size">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <ImageView
-                            android:layout_width="@dimen/main_logo_size"
-                            android:layout_height="@dimen/main_logo_size"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/application_name"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/easyclash_logo" />
-                    </FrameLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/application_name"
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@{clashRunning ? @drawable/bg_ec_dot_on : @drawable/bg_ec_dot_off}" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/application_name"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="11sp" />
                 </LinearLayout>
 
-                <com.github.kr328.clash.design.view.LargeActionCard
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.ToggleStatus)}"
-                    android:theme="@style/AppThemeDark"
-                    app:cardBackgroundColor="@{clashRunning ? colorClashStarted : colorClashStopped}"
-                    app:icon="@{clashRunning ? @drawable/ic_outline_check_circle : @drawable/ic_outline_not_interested}"
-                    app:subtext="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
-                    app:text="@{clashRunning ? @string/running : @string/stopped}" />
-
-                <com.github.kr328.clash.design.view.LargeActionCard
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenProxy)}"
-                    android:visibility="@{clashRunning ? View.VISIBLE : View.GONE}"
-                    app:icon="@drawable/ic_baseline_apps"
-                    app:subtext="@{mode}"
-                    app:text="@string/proxy" />
-
-                <com.github.kr328.clash.design.view.LargeActionCard
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_card_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenProfiles)}"
-                    app:icon="@drawable/ic_baseline_view_list"
-                    app:subtext="@{profileName != null ? @string/format_profile_activated(profileName) : @string/not_selected}"
-                    app:text="@string/profile" />
-
-                <com.github.kr328.clash.design.view.LargeActionLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenProviders)}"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_baseline_swap_vertical_circle"
-                    app:text="@string/providers" />
-
-                <com.github.kr328.clash.design.view.LargeActionLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenLogs)}"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_baseline_assignment"
-                    app:text="@string/logs" />
-
-                <com.github.kr328.clash.design.view.LargeActionLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/settings"
                     android:onClick="@{() -> self.request(Request.OpenSettings)}"
-                    app:icon="@drawable/ic_baseline_settings"
-                    app:text="@string/settings" />
-
-                <com.github.kr328.clash.design.view.LargeActionLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenHelp)}"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_baseline_help_center"
-                    app:text="@string/help" />
-
-                <com.github.kr328.clash.design.view.LargeActionLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/main_label_margin_vertical"
-                    android:onClick="@{() -> self.request(Request.OpenAbout)}"
-                    app:icon="@drawable/ic_baseline_info"
-                    app:text="@string/about" />
+                    android:padding="8dp"
+                    android:src="@drawable/ic_baseline_settings" />
             </LinearLayout>
-        </ScrollView>
+
+            <!-- TabBar: 连接 | 节点 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_ec_picker"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@{homeTab ? @drawable/bg_ec_picker_active : null}"
+                    android:gravity="center"
+                    android:onClick="@{() -> self.request(Request.ShowHome)}"
+                    android:text="@string/tab_connect"
+                    android:textColor="@{homeTab ? @color/color_clash_light : ?android:attr/textColorSecondary}"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@{homeTab ? null : @drawable/bg_ec_picker_active}"
+                    android:gravity="center"
+                    android:onClick="@{() -> self.request(Request.OpenProxy)}"
+                    android:text="@string/tab_nodes"
+                    android:textColor="@{homeTab ? ?android:attr/textColorSecondary : @color/color_clash_light}"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingBottom="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/connection_mode"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_ec_mode"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{mode}"
+                                android:textColor="@color/color_clash_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/smart_mode_desc"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- 开关卡：点一下开/关代理 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@{clashRunning ? @drawable/bg_ec_card_active : @drawable/bg_ec_card}"
+                        android:gravity="center_vertical"
+                        android:onClick="@{() -> self.request(Request.ToggleStatus)}"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{clashRunning ? @string/running : @string/stopped}"
+                                android:textColor="?android:attr/textColorPrimary"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@{clashRunning ? @string/format_traffic_forwarded(forwarded) : @string/tap_to_start}"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@{clashRunning ? @drawable/bg_ec_badge_on : @drawable/bg_ec_badge_off}"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="@{clashRunning ? @string/badge_in_use : @string/badge_idle}"
+                            android:textColor="@{clashRunning ? @color/color_clash_light : ?android:attr/textColorSecondary}"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/profiles"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <!-- 当前订阅卡 → 进订阅页（桌面：点订阅即用） -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@{clashRunning ? @drawable/bg_ec_card_active : @drawable/bg_ec_card}"
+                        android:onClick="@{() -> self.request(Request.OpenProfiles)}"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="@{profileName != null ? profileName : @string/not_selected}"
+                                android:textColor="?android:attr/textColorPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/manage_subscriptions"
+                                android:textColor="@color/color_clash_light"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/subscription_card_hint"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

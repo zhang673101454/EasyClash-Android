@@ -43,7 +43,10 @@ class MainActivity : BaseActivity<MainDesign>() {
             select<Unit> {
                 events.onReceive {
                     when (it) {
-                        Event.ActivityStart,
+                        Event.ActivityStart -> {
+                            design.setHomeTab(true)
+                            design.fetch()
+                        }
                         Event.ServiceRecreated,
                         Event.ClashStop, Event.ClashStart,
                         Event.ProfileLoaded, Event.ProfileChanged -> design.fetch()
@@ -58,8 +61,12 @@ class MainActivity : BaseActivity<MainDesign>() {
                             else
                                 design.startClash()
                         }
-                        MainDesign.Request.OpenProxy ->
+                        MainDesign.Request.ShowHome ->
+                            design.setHomeTab(true)
+                        MainDesign.Request.OpenProxy -> {
+                            design.setHomeTab(false)
                             startActivity(ProxyActivity::class.intent)
+                        }
                         MainDesign.Request.OpenProfiles ->
                             startActivity(ProfilesActivity::class.intent)
                         MainDesign.Request.OpenProviders ->
@@ -72,7 +79,7 @@ class MainActivity : BaseActivity<MainDesign>() {
                             }
                         }
                         MainDesign.Request.OpenSettings ->
-                            startActivity(SettingsActivity::class.intent)
+                            startActivity(AppSettingsActivity::class.intent)
                         MainDesign.Request.OpenHelp ->
                             startActivity(HelpActivity::class.intent)
                         MainDesign.Request.OpenAbout ->
