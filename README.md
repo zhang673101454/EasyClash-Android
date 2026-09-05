@@ -4,6 +4,8 @@ EasyClash 的 Android 客户端，基于 [Clash Meta for Android](https://github
 
 与 [EasyClash 桌面版](https://github.com/zhang673101454/EasyClash) 同一产品思路：**点订阅即用、智能分流、多订阅互刷**。
 
+![EasyClash Android 宣传图](docs/software-poster-marketing.png)
+
 ## 保留功能
 
 - 订阅 URL 添加 / 编辑 / 删除 / 刷新（流量与节点）
@@ -28,4 +30,5 @@ EasyClash 的 Android 客户端，基于 [Clash Meta for Android](https://github
 
 ## 预览
 
-静态界面稿：`docs/ui-preview.html`
+- 宣传图：`docs/software-poster-marketing.png`
+- 界面稿：`docs/ui-preview.html` / `docs/software-poster.png`
