@@ -12,7 +12,6 @@ import com.github.kr328.clash.design.databinding.DesignMainBinding
 import com.github.kr328.clash.design.databinding.DialogSubscriptionBinding
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.design.util.ValidatorHttpUrl
-import com.github.kr328.clash.design.util.ValidatorNotBlank
 import com.github.kr328.clash.design.util.applyLinearAdapter
 import com.github.kr328.clash.design.util.layoutInflater
 import com.github.kr328.clash.design.util.patchDataSet
@@ -190,22 +189,19 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
 
                 dialog.setOnShowListener {
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                        val name = form.nameField.text?.toString()?.trim().orEmpty()
+                        val rawName = form.nameField.text?.toString()?.trim().orEmpty()
                         val url = form.urlField.text?.toString()?.trim().orEmpty()
-                        form.nameLayout.error = null
                         form.urlLayout.error = null
+                        form.urlLayout.isErrorEnabled = false
 
-                        var valid = true
-                        if (!ValidatorNotBlank(name)) {
-                            form.nameLayout.error = context.getString(R.string.empty_name)
-                            valid = false
-                        }
                         if (!ValidatorHttpUrl(url)) {
+                            form.urlLayout.isErrorEnabled = true
                             form.urlLayout.error = context.getString(R.string.invalid_url)
-                            valid = false
+                            return@setOnClickListener
                         }
-                        if (!valid) return@setOnClickListener
 
+                        // 备注可选：空则用默认名
+                        val name = rawName.ifBlank { context.getString(R.string.new_profile) }
                         cont.resume(SubscriptionForm(name, url))
                         dialog.dismiss()
                     }

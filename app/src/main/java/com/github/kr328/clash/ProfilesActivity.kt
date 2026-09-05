@@ -59,12 +59,6 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
                                 }
                             }
                         is ProfilesDesign.Request.Update -> {
-                            if (!clashRunning) {
-                                design.showToast(
-                                    R.string.subscription_refresh_need_proxy,
-                                    ToastDuration.Long
-                                )
-                            }
                             withProfile { update(it.profile.uuid) }
                         }
                         is ProfilesDesign.Request.Delete ->
@@ -134,14 +128,12 @@ class ProfilesActivity : BaseActivity<ProfilesDesign>() {
     override fun onProfileUpdateFailed(uuid: UUID?, reason: String?) {
         if (uuid == null) return
         launch {
-            val tip = if (!clashRunning) {
-                getString(R.string.subscription_refresh_need_proxy)
-            } else {
-                var name: String? = null
-                withProfile { name = queryByUUID(uuid)?.name }
-                getString(R.string.toast_profile_updated_failed, name, reason)
-            }
-            design?.showToast(tip, ToastDuration.Long) {
+            var name: String? = null
+            withProfile { name = queryByUUID(uuid)?.name }
+            design?.showToast(
+                getString(R.string.toast_profile_updated_failed, name, reason),
+                ToastDuration.Long
+            ) {
                 setAction(R.string.edit) {
                     startActivity(PropertiesActivity::class.intent.setUUID(uuid))
                 }

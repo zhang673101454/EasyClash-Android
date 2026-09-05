@@ -372,9 +372,7 @@ class MainActivity : BaseActivity<MainDesign>() {
         if (!profile.imported || profile.type == Profile.Type.File) {
             return
         }
-        if (!clashRunning) {
-            showToast(DesignR.string.subscription_refresh_need_proxy, ToastDuration.Long)
-        }
+        // 直接刷新，不强依赖当前是否已开启代理
         withProfile { update(profile.uuid) }
     }
 
@@ -411,14 +409,12 @@ class MainActivity : BaseActivity<MainDesign>() {
     override fun onProfileUpdateFailed(uuid: UUID?, reason: String?) {
         if (uuid == null) return
         launch {
-            val tip = if (!clashRunning) {
-                getString(DesignR.string.subscription_refresh_need_proxy)
-            } else {
-                var name: String? = null
-                withProfile { name = queryByUUID(uuid)?.name }
-                getString(DesignR.string.toast_profile_updated_failed, name, reason)
-            }
-            design?.showToast(tip, ToastDuration.Long)
+            var name: String? = null
+            withProfile { name = queryByUUID(uuid)?.name }
+            design?.showToast(
+                getString(DesignR.string.toast_profile_updated_failed, name, reason),
+                ToastDuration.Long
+            )
         }
     }
 
