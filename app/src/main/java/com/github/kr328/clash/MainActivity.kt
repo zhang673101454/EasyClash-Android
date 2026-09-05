@@ -6,21 +6,24 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
-import com.github.kr328.clash.common.util.intent
-import com.github.kr328.clash.common.util.setUUID
 import com.github.kr328.clash.common.util.ticker
 import com.github.kr328.clash.core.Clash
+import com.github.kr328.clash.core.model.FetchStatus
 import com.github.kr328.clash.core.model.ProxySort
 import com.github.kr328.clash.design.MainDesign
 import com.github.kr328.clash.design.ProxyDesign
 import com.github.kr328.clash.design.R as DesignR
+import com.github.kr328.clash.design.dialog.ModelProgressBarConfigure
+import com.github.kr328.clash.design.dialog.withModelProgressBar
 import com.github.kr328.clash.design.model.ProxyState
 import com.github.kr328.clash.design.ui.ToastDuration
+import com.github.kr328.clash.design.util.showExceptionToast
 import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.util.startClashService
 import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
 import com.github.kr328.clash.util.withProfile
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
@@ -48,6 +51,7 @@ class MainActivity : BaseActivity<MainDesign>() {
         setContentDesign(design)
         design.fetchStatus()
         design.fetchProfiles()
+        design.refreshCurrentNode()
 
         val trafficTicker = ticker(TimeUnit.SECONDS.toMillis(1))
         val elapsedTicker = ticker(TimeUnit.MINUTES.toMillis(1))
@@ -60,12 +64,17 @@ class MainActivity : BaseActivity<MainDesign>() {
                         Event.ActivityStart -> {
                             design.fetchStatus()
                             design.fetchProfiles()
+                            design.refreshCurrentNode()
                         }
                         Event.ServiceRecreated,
                         Event.ClashStop,
-                        Event.ClashStart -> design.fetchStatus()
+                        Event.ClashStart -> {
+                            design.fetchStatus()
+                            design.refreshCurrentNode()
+                        }
                         Event.ProfileLoaded -> {
                             design.fetchStatus()
+                            design.refreshCurrentNode()
                             if (proxyDesign != null) {
                                 launch { recreateProxyPanel(design) }
                             }
@@ -85,13 +94,16 @@ class MainActivity : BaseActivity<MainDesign>() {
                             ensureProxyPanel(design)
                         }
                         MainDesign.Request.UrlTest -> proxyDesign?.requestUrlTesting()
-                        MainDesign.Request.Create -> createSubscription()
+                        MainDesign.Request.Create -> design.createSubscription()
                         is MainDesign.Request.Active -> design.toggleSubscription(req.profile)
                         is MainDesign.Request.Update -> design.updateSubscription(req.profile)
-                        is MainDesign.Request.Edit ->
-                            startActivity(PropertiesActivity::class.intent.setUUID(req.profile.uuid))
-                        is MainDesign.Request.Delete ->
-                            withProfile { delete(req.profile.uuid) }
+                        is MainDesign.Request.Edit -> design.editSubscription(req.profile)
+                        is MainDesign.Request.Delete -> {
+                            if (design.requestDeleteConfirm(req.profile)) {
+                                withProfile { delete(req.profile.uuid) }
+                                design.fetchProfiles()
+                            }
+                        }
                     }
                 }
                 if (embeddedProxy != null) {
@@ -113,10 +125,80 @@ class MainActivity : BaseActivity<MainDesign>() {
         }
     }
 
-    private suspend fun createSubscription() {
-        withProfile {
-            val uuid = create(Profile.Type.Url, getString(DesignR.string.new_profile))
-            startActivity(PropertiesActivity::class.intent.setUUID(uuid))
+    private suspend fun MainDesign.createSubscription() {
+        val form = requestSubscriptionForm(
+            title = getString(DesignR.string.create_profile),
+            initialName = "",
+            initialUrl = "",
+        ) ?: return
+
+        var created: UUID? = null
+        try {
+            context.withModelProgressBar {
+                configure {
+                    isIndeterminate = true
+                    text = getString(DesignR.string.initializing)
+                }
+                withProfile {
+                    created = create(Profile.Type.Url, form.name, form.url)
+                    val uuid = created!!
+                    coroutineScope {
+                        commit(uuid) { status ->
+                            launch {
+                                configure {
+                                    applyFetchStatus(status)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            fetchProfiles()
+        } catch (e: Exception) {
+            created?.let { id ->
+                withProfile {
+                    runCatching { release(id) }
+                    runCatching { delete(id) }
+                }
+            }
+            showExceptionToast(e)
+        }
+    }
+
+    private suspend fun MainDesign.editSubscription(profile: Profile) {
+        if (profile.type == Profile.Type.File) {
+            showToast(DesignR.string.invalid_url, ToastDuration.Long)
+            return
+        }
+
+        val form = requestSubscriptionForm(
+            title = getString(DesignR.string.edit),
+            initialName = profile.name,
+            initialUrl = profile.source,
+        ) ?: return
+
+        try {
+            context.withModelProgressBar {
+                configure {
+                    isIndeterminate = true
+                    text = getString(DesignR.string.initializing)
+                }
+                withProfile {
+                    patch(profile.uuid, form.name, form.url, profile.interval, profile.ageSecretKey)
+                    coroutineScope {
+                        commit(profile.uuid) { status ->
+                            launch {
+                                configure {
+                                    applyFetchStatus(status)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            fetchProfiles()
+        } catch (e: Exception) {
+            showExceptionToast(e)
         }
     }
 
@@ -174,6 +256,9 @@ class MainActivity : BaseActivity<MainDesign>() {
                         state,
                         names.indices.map { names[it] to states[it] }.toMap()
                     )
+                    if (req.index == 0) {
+                        main.setCurrentNode(group.now)
+                    }
                 }
             }
             is ProxyDesign.Request.Select -> {
@@ -183,6 +268,7 @@ class MainActivity : BaseActivity<MainDesign>() {
                     states[req.index].now = req.name
                 }
                 design.requestRedrawVisible()
+                main.setCurrentNode(req.name)
             }
             is ProxyDesign.Request.UrlTest -> {
                 if (req.index !in names.indices) return
@@ -200,11 +286,36 @@ class MainActivity : BaseActivity<MainDesign>() {
                             patchSelector(names[req.index], best.name)
                         }
                         states[req.index].now = best.name
+                        main.setCurrentNode(best.name)
+                    } else {
+                        main.setCurrentNode(group.now)
                     }
                     design.requests.send(ProxyDesign.Request.Reload(req.index))
                 }
             }
             is ProxyDesign.Request.PatchMode -> Unit
+        }
+    }
+
+    private fun ModelProgressBarConfigure.applyFetchStatus(status: FetchStatus) {
+        when (status.action) {
+            FetchStatus.Action.FetchConfiguration -> {
+                text = getString(DesignR.string.format_fetching_configuration, status.args[0])
+                isIndeterminate = true
+            }
+            FetchStatus.Action.FetchProviders -> {
+                text = getString(DesignR.string.format_fetching_provider, status.args[0])
+                isIndeterminate = false
+                max = status.max
+                progress = status.progress
+            }
+            FetchStatus.Action.SubscriptionInfo -> Unit
+            FetchStatus.Action.Verifying -> {
+                text = getString(DesignR.string.verifying)
+                isIndeterminate = false
+                max = status.max
+                progress = status.progress
+            }
         }
     }
 
@@ -220,6 +331,24 @@ class MainActivity : BaseActivity<MainDesign>() {
 
     private suspend fun MainDesign.fetchTraffic() {
         withClash { setForwarded(queryTrafficTotal()) }
+    }
+
+    private suspend fun MainDesign.refreshCurrentNode() {
+        if (!clashRunning) {
+            setCurrentNode(null)
+            return
+        }
+        // 优先用已加载的节点面板状态，否则直接查 core
+        val cached = proxyStates.firstOrNull()?.now
+        if (!cached.isNullOrBlank() && cached != "?") {
+            setCurrentNode(cached)
+            return
+        }
+        val rawNames = withClash { queryProxyGroupNames(true) }
+        val names = ProxyDesign.liteGroupNames(rawNames)
+        val groupName = names.firstOrNull() ?: return setCurrentNode(null)
+        val group = withClash { queryProxyGroup(groupName, ProxySort.Delay) }
+        setCurrentNode(group.now)
     }
 
     private suspend fun MainDesign.toggleSubscription(profile: Profile) {

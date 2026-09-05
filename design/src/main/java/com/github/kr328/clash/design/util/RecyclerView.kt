@@ -66,10 +66,16 @@ fun RecyclerView.invalidateChildren() {
     }
 }
 
-fun RecyclerView.bindInsets(surface: Surface, top: Int = 0, bottom: Int = 0) {
+fun RecyclerView.bindInsets(
+    surface: Surface,
+    top: Int = 0,
+    bottom: Int = 0,
+    includeStatusBar: Boolean = true,
+) {
     fun applyInsets() {
-        val t = surface.insets.top + top
-        val b = surface.insets.bottom + bottom
+        // 嵌入主界面时外层已垫过状态栏，避免顶部重复留白
+        val t = (if (includeStatusBar) surface.insets.top else 0) + top
+        val b = (if (includeStatusBar) surface.insets.bottom else 0) + bottom
 
         setPaddingRelative(0, t, 0, b)
     }

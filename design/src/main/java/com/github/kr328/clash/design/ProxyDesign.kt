@@ -100,8 +100,10 @@ class ProxyDesign(
                         ProxyAdapter(config) { name ->
                             requests.trySend(Request.Select(index, name))
                         }
-                    }
-                ) { }
+                    },
+                    stateChanged = { },
+                    embedded = true,
+                )
             }
         }
     }

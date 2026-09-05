@@ -32,6 +32,9 @@
             name="urlTesting"
             type="boolean" />
         <variable
+            name="profilesEmpty"
+            type="boolean" />
+        <variable
             name="appVersion"
             type="String" />
         <variable
@@ -98,8 +101,10 @@
                     </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="@{mode}"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="11sp" />
@@ -185,7 +190,17 @@
                     android:clipToPadding="false"
                     android:paddingBottom="36dp"
                     android:scrollbars="none"
-                    android:visibility="@{homeTab ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{homeTab &amp;&amp; !profilesEmpty ? View.VISIBLE : View.GONE}" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:text="@string/profiles_empty_tips"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp"
+                    android:visibility="@{homeTab &amp;&amp; profilesEmpty ? View.VISIBLE : View.GONE}" />
 
                 <FrameLayout
                     android:id="@+id/proxy_host"

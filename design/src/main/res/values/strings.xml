@@ -11,12 +11,14 @@
 
     <string name="proxy">节点</string>
     <string name="smart_mode">智能模式</string>
+    <string name="smart_mode_with_node">智能模式|%1$s</string>
+    <string name="waiting_node">等待节点</string>
     <string name="direct_mode">Direct Mode</string>
     <string name="rule_mode">Rule Mode</string>
     <string name="global_mode">Global Mode</string>
-    <string name="proxy_empty_tips">No groups can be displayed</string>
+    <string name="proxy_empty_tips">暂无节点，请先添加并开启订阅</string>
 
-    <string name="profiles">订阅</string>
+    <string name="profiles_empty_tips">点右上角 + 添加订阅地址</string>
     <string name="not_selected">未选择订阅</string>
     <string name="format_profile_activated">%s 使用中</string>
 
@@ -96,13 +98,15 @@
     <string name="should_not_be_blank">Should not be blank</string>
     <string name="detail">Detail</string>
     <string name="update">Update</string>
-    <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="delete_subscription">删除订阅</string>
+    <string name="delete_subscription_warn">确认删除「%1$s」？此操作不可恢复。</string>
     <string name="export">Export</string>
     <string name="import_">Import</string>
     <string name="properties">Properties</string>
     <string name="duplicate">Duplicate</string>
-    <string name="active_unsaved_tips">Profile needs to be saved before activation</string>
+    <string name="active_unsaved_tips">请先保存订阅后再开启</string>
 
     <string name="exit_without_save">Exit without Save</string>
     <string name="exit_without_save_warning">All changed will *LOST*</string>
@@ -110,8 +114,8 @@
     <string name="raw_cn" translatable="false">cn</string>
     <string name="disabled">Disabled</string>
     <string name="unavailable">Unavailable</string>
-    <string name="empty_name">Empty Name</string>
-    <string name="invalid_url">Invalid URL</string>
+    <string name="empty_name">请填写备注名称</string>
+    <string name="invalid_url">请填写有效的订阅地址</string>
     <string name="loading">Loading</string>
 
     <string name="format_fetching_configuration">Fetching configuration from \'%s\'</string>
@@ -125,8 +129,8 @@
     <string name="sort">Sort</string>
     <string name="default_">Default</string>
 
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
     <string name="reset">Reset</string>
 
     <string name="clash_logcat">Clash Logcat</string>

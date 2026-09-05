@@ -19,6 +19,8 @@ class ProxyPageAdapter(
     private val config: ProxyViewConfig,
     private val adapters: List<ProxyAdapter>,
     private val stateChanged: (Int) -> Unit,
+    /** 嵌入主界面节点 Tab：不再为 ActivityBar/分组 Tab/状态栏预留顶部 padding */
+    private val embedded: Boolean = false,
 ) : RecyclerView.Adapter<ProxyPageFactory.Holder>() {
     private val factory = ProxyPageFactory(config)
     private var parent: RecyclerView? = null
@@ -58,10 +60,13 @@ class ProxyPageAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProxyPageFactory.Holder {
         val holder = factory.newInstance()
 
-        val toolbarHeight = config.context.getPixels(R.dimen.toolbar_height)
-        val tabHeight = config.context.getPixels(R.dimen.tab_layout_height)
-
-        holder.recyclerView.bindInsets(surface, toolbarHeight + tabHeight)
+        if (embedded) {
+            holder.recyclerView.bindInsets(surface, top = 0, bottom = 0, includeStatusBar = false)
+        } else {
+            val toolbarHeight = config.context.getPixels(R.dimen.toolbar_height)
+            val tabHeight = config.context.getPixels(R.dimen.tab_layout_height)
+            holder.recyclerView.bindInsets(surface, toolbarHeight + tabHeight)
+        }
         holder.recyclerView.addScrolledToBottomObserver { view, bottom ->
             val position = view.position
             val state = states[position]
